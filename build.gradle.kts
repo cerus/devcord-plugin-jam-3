@@ -80,6 +80,6 @@ tasks {
 bukkit {
     name = "GameJamPlugin"
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.STARTUP
-    main = "club.devcord.gamejam.JamPlugin"
+    main = "me.celus.pluginjam.JamPlugin"
     apiVersion = "1.21"
 }

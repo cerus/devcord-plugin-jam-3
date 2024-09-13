@@ -1,4 +1,4 @@
-package club.devcord.gamejam;
+package me.celus.pluginjam;
 
 import static org.junit.Assert.assertTrue;
 
