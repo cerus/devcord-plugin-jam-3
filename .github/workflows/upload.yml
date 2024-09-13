@@ -1,0 +1,26 @@
+name: Gradle Upload
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  upload:
+    name: Upload to server
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - uses: gradle/wrapper-validation-action@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: adopt
+          java-version: 21
+      - name: Build with Gradle
+        run: ./gradlew --build-cache test build
+      - name: Publish
+        run: ./gradlew uploadJar
+        env:
+          UPLOAD_URL: ${{ secrets.UPLOAD_URL }}
