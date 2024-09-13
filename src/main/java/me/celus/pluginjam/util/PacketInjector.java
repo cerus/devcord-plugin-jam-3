@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public final class PacketInjector {
+
     private static final Map<Class<?>, List<PacketHandler>> typedOutboundHandlers = new ConcurrentHashMap<>();
     private static final Map<Class<?>, List<PacketHandler>> typedInboundHandlers = new ConcurrentHashMap<>();
 
@@ -54,7 +55,11 @@ public final class PacketInjector {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static boolean handlePacket(Map<Class<?>, List<PacketHandler>> handlers, Player player, Packet<?> packet) {
-        for (PacketHandler handler : handlers.get(packet.getClass())) {
+        List<PacketHandler> packetHandlers = handlers.get(packet.getClass());
+        if (packetHandlers == null) {
+            return false;
+        }
+        for (PacketHandler handler : packetHandlers) {
             if (!handler.handle(player, packet)) {
                 return true;
             }

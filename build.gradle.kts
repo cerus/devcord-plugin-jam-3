@@ -79,7 +79,7 @@ tasks {
 
 bukkit {
     name = "GameJamPlugin"
-    load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.STARTUP
+    load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
     main = "me.celus.pluginjam.JamPlugin"
     apiVersion = "1.21"
 }
