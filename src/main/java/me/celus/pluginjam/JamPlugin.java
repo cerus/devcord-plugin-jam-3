@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 
+import me.celus.pluginjam.feature.ArrowHitShowsCreditsFeature;
 import me.celus.pluginjam.feature.Feature;
 import me.celus.pluginjam.feature.SheepExplosionFeature;
 import me.celus.pluginjam.listener.ElytraListener;
@@ -17,6 +18,12 @@ import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -67,6 +74,7 @@ public class JamPlugin extends JavaPlugin {
         gameWorld.setSpawnLocation(SPAWN_X, gameWorld.getHighestBlockYAt(SPAWN_X, SPAWN_Z) + 1, SPAWN_Z);
 
         registerFeature(new SheepExplosionFeature());
+        registerFeature(new ArrowHitShowsCreditsFeature());
     }
 
     public void generateSpawnBox(Material wallMat, Material floorMat) {
@@ -95,4 +103,5 @@ public class JamPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(feature, this);
         feature.onRegister(this);
     }
+
 }

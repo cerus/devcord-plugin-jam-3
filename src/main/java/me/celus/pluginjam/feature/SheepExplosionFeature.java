@@ -4,15 +4,12 @@ import me.celus.pluginjam.JamPlugin;
 import me.celus.pluginjam.util.PacketTricks;
 import net.minecraft.network.protocol.game.ClientboundHurtAnimationPacket;
 import org.bukkit.Sound;
-import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,7 +35,7 @@ public class SheepExplosionFeature implements Feature {
         primedSheep.add(id);
 
         entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_CREEPER_PRIMED, 1, 1);
-        
+
         int durationTicks = 80;
         new BukkitRunnable() {
             private int ticks = 0;

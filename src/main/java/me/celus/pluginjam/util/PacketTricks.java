@@ -16,6 +16,11 @@ public final class PacketTricks {
         sendPacket(player, packet);
     }
 
+    public static void showCredits(Player player) {
+        ClientboundGameEventPacket packet = new ClientboundGameEventPacket(ClientboundGameEventPacket.WIN_GAME, 1);
+        sendPacket(player, packet);
+    }
+
     public static void sendPacket(Player player, Packet<?> packet) {
         ((CraftPlayer) player).getHandle().connection.sendPacket(packet);
     }
