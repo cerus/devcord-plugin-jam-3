@@ -4,6 +4,9 @@ package me.celus.pluginjam;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
+
+import me.celus.pluginjam.feature.Feature;
+import me.celus.pluginjam.feature.SheepExplosionFeature;
 import me.celus.pluginjam.listener.ElytraListener;
 import me.celus.pluginjam.listener.PlayerJoinListener;
 import me.celus.pluginjam.util.PacketInjector;
@@ -62,6 +65,8 @@ public class JamPlugin extends JavaPlugin {
         generateSpawnBox(Material.BEDROCK, Material.GLASS);
 
         gameWorld.setSpawnLocation(SPAWN_X, gameWorld.getHighestBlockYAt(SPAWN_X, SPAWN_Z) + 1, SPAWN_Z);
+
+        registerFeature(new SheepExplosionFeature());
     }
 
     public void generateSpawnBox(Material wallMat, Material floorMat) {
@@ -84,5 +89,10 @@ public class JamPlugin extends JavaPlugin {
 
     public World getGameWorld() {
         return gameWorld;
+    }
+
+    private void registerFeature(Feature feature) {
+        getServer().getPluginManager().registerEvents(feature, this);
+        feature.onRegister(this);
     }
 }
