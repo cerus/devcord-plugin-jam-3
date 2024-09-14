@@ -124,7 +124,6 @@ public class Game implements Listener {
         plugin.getLogger().info("Disposing game");
         mapView.getRenderers().forEach(mapView::removeRenderer);
         gameTask.cancel();
-        setState(null);
         HandlerList.unregisterAll(this);
     }
 
