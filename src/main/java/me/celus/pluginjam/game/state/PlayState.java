@@ -2,6 +2,7 @@ package me.celus.pluginjam.game.state;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -19,24 +20,28 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.map.MapView;
 
 public class PlayState extends GameState {
 
-    private static final boolean DEBUG_NO_FINISH = false;
+    private static final boolean DEBUG_NO_FINISH = true;
 
     private static final int GAME_LENGTH = 20 * 60 * 10;
     private static final int ZONE_SHRINK_AMOUNT = 4;
     private static final int ZONE_SHRINK_TICKS = GAME_LENGTH / ZONE_SHRINK_AMOUNT;
+    private static final int ELYTRA_DURABILITY = 30;
     private static final Object OBJECT = new Object();
 
-    private final Cache<UUID, Object> recentGlidingPlayers = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.SECONDS).build();
+    private final Cache<UUID, Object> recentGlidingPlayers = CacheBuilder.newBuilder().expireAfterWrite(500, TimeUnit.MILLISECONDS).build();
+    private final Set<UUID> ignoreFallDamage = new HashSet<>();
     private BossBar gameEndBar;
     private BossBar zoneChangeBar;
     private int remainingTicks;
@@ -90,8 +95,10 @@ public class PlayState extends GameState {
         getGame().generateSpawnBox(Material.AIR, Material.AIR);
         forEachPlayerInGame(player -> {
             getPlugin().getServer().getScheduler().runTaskLater(getPlugin(), () -> player.setGliding(true), 3);
+            player.getEquipment().setChestplate(buildElytra());
             player.setGameMode(GameMode.SURVIVAL);
             player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1);
+            ignoreFallDamage.add(player.getUniqueId());
             gameEndBar.addPlayer(player);
             zoneChangeBar.addPlayer(player);
         });
@@ -99,6 +106,12 @@ public class PlayState extends GameState {
         MapView mapView = getGame().getMapView();
         mapView.addRenderer(new GameBorderRenderer(getGame()));
         mapView.addRenderer(new PlayerCursorRenderer(getGame()));
+    }
+
+    private ItemStack buildElytra() {
+        ItemStack elytra = new ItemStack(Material.ELYTRA);
+        elytra.editMeta(Damageable.class, d -> d.setDamage(Material.ELYTRA.getMaxDurability() - ELYTRA_DURABILITY));
+        return elytra;
     }
 
     @Override
@@ -134,8 +147,8 @@ public class PlayState extends GameState {
         if (chestplate == null || chestplate.getType() != Material.ELYTRA) {
             return;
         }
+        ignoreFallDamage.remove(player.getUniqueId());
         player.getEquipment().setChestplate(null);
-        player.setFallDistance(0);
     }
 
     @EventHandler
@@ -165,6 +178,24 @@ public class PlayState extends GameState {
         if (!player.isGliding()
             && recentGlidingPlayers.getIfPresent(player.getUniqueId()) == null
             && (equipment.getChestplate() == null || equipment.getChestplate().getType() != Material.ELYTRA)) {
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onDamage2(EntityDamageEvent event) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.FALL) {
+            return;
+        }
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+        EntityEquipment equipment = player.getEquipment();
+        if (equipment.getChestplate() != null && equipment.getChestplate().getType() == Material.ELYTRA) {
+            return;
+        }
+        if (!ignoreFallDamage.remove(player.getUniqueId())) {
             return;
         }
         event.setCancelled(true);

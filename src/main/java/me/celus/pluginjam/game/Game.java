@@ -34,7 +34,7 @@ public class Game implements Listener {
     public static final int GAME_WIDTH = 21;
     public static final double WATER_BIOME_THRESHOLD = 0.25;
     private static final EnumSet<Biome> WATER_BIOMES = EnumSet.of(Biome.OCEAN, Biome.COLD_OCEAN, Biome.DEEP_OCEAN, Biome.DEEP_COLD_OCEAN,
-            Biome.WARM_OCEAN, Biome.LUKEWARM_OCEAN, Biome.FROZEN_OCEAN, Biome.DEEP_LUKEWARM_OCEAN, Biome.RIVER, Biome.FROZEN_RIVER);
+            Biome.WARM_OCEAN, Biome.LUKEWARM_OCEAN, Biome.FROZEN_OCEAN, Biome.DEEP_LUKEWARM_OCEAN, Biome.RIVER, Biome.FROZEN_RIVER, Biome.DEEP_FROZEN_OCEAN);
 
     private final List<Participant> participants = new ArrayList<>();
     private final JamPlugin plugin;
@@ -63,9 +63,9 @@ public class Game implements Listener {
 
         world.setSpawnLocation(spawnLoc.getBlockX(), (world.getMaxHeight() - 8) + 1, spawnLoc.getBlockZ());
 
+        byte[] paintedWorld = new byte[128 * 128];
         mapView = plugin.getServer().createMap(world);
         mapView.getRenderers().forEach(mapView::removeRenderer);
-        byte[] paintedWorld = new byte[128 * 128];
         mapView.addRenderer(new PaintedWorldRenderer(paintedWorld));
 
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -156,7 +156,9 @@ public class Game implements Listener {
     public void onRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         player.getInventory().clear();
-        player.setGameMode(GameMode.SPECTATOR);
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            player.setGameMode(GameMode.SPECTATOR);
+        }, 3);
 
         Location spawnLoc = player.getWorld().getSpawnLocation().clone();
         spawnLoc.setY(spawnLoc.getWorld().getMaxHeight() - 8);

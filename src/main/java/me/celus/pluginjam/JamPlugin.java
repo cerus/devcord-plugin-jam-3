@@ -3,9 +3,12 @@ package me.celus.pluginjam;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import me.celus.pluginjam.feature.ArrowHitShowsCreditsFeature;
 import me.celus.pluginjam.feature.Feature;
+import me.celus.pluginjam.feature.FluidSwitchFeature;
 import me.celus.pluginjam.feature.SheepExplosionFeature;
 import me.celus.pluginjam.game.Game;
 import me.celus.pluginjam.game.state.WaitingState;
@@ -20,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class JamPlugin extends JavaPlugin {
 
+    private final Set<Feature> features = new HashSet<>();
     private Game game;
 
     @Override
@@ -51,6 +55,7 @@ public class JamPlugin extends JavaPlugin {
 
         registerFeature(new SheepExplosionFeature());
         registerFeature(new ArrowHitShowsCreditsFeature());
+        registerFeature(new FluidSwitchFeature());
 
         PacketInjector.registerOutboundHandler(ClientboundLevelChunkWithLightPacket.class, (player, packet) -> {
             if (game == null || game.getWorld() == null) {
@@ -69,16 +74,22 @@ public class JamPlugin extends JavaPlugin {
     public void newGame() {
         if (game != null) {
             game.stop();
+            features.forEach(f -> f.onGameDestroyed(game));
         }
         World world = getServer().getWorld("world");
         game = new Game(this, world);
         game.start(new WaitingState());
         getServer().getPluginManager().registerEvents(game, this);
+        features.forEach(f -> f.onGameSpawned(game));
     }
 
     private void registerFeature(Feature feature) {
         getServer().getPluginManager().registerEvents(feature, this);
         feature.onRegister(this);
+        features.add(feature);
     }
 
+    public Game getGame() {
+        return game;
+    }
 }

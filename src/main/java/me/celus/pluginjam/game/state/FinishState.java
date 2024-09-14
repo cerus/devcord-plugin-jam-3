@@ -4,6 +4,8 @@ import me.celus.pluginjam.game.GameState;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 public class FinishState extends GameState {
 
@@ -35,6 +37,11 @@ public class FinishState extends GameState {
                     Component.text("hat die Runde gewonnen").color(NamedTextColor.GRAY)
             );
         }
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        event.setCancelled(true);
     }
 
     @Override

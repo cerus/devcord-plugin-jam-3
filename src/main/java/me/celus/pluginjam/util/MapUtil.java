@@ -17,22 +17,23 @@ import org.bukkit.craftbukkit.CraftWorld;
 
 public class MapUtil {
 
+    private static final double BLOCKS_PER_PIXEL = (Game.GAME_WIDTH * 16) / 128d;
+
     public static void paintWorld(World world, byte[] data) {
         AtomicDouble d = new AtomicDouble();
-        double blocksPerPixel = (Game.GAME_WIDTH * 16) / 128d;
         for (int px = 0; px < 128; px++) {
             d.set(0);
             for (int py = 0; py < 128; py++) {
-                byte color = getMapColor(world, blocksPerPixel, px, py, d);
+                byte color = getMapColor(world, px, py, d);
                 data[px * 128 + py] = color;
             }
         }
     }
 
-    private static byte getMapColor(World world, double bpp, int px, int py, AtomicDouble d) {
+    private static byte getMapColor(World world, int px, int py, AtomicDouble d) {
         Level nmsWorld = ((CraftWorld) world).getHandle();
-        int blockX = (int) (world.getSpawnLocation().getX() + (px - 64) * bpp);
-        int blockZ = (int) (world.getSpawnLocation().getZ() + (py - 64) * bpp);
+        int blockX = (int) (world.getSpawnLocation().getX() + (px - 64) * BLOCKS_PER_PIXEL);
+        int blockZ = (int) (world.getSpawnLocation().getZ() + (py - 64) * BLOCKS_PER_PIXEL);
         int t = 0;
         int scale = /*(int) Math.ceil(bpp)*/1;
         double e = 0;

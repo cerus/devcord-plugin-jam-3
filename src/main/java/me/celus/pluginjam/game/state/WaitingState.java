@@ -57,7 +57,6 @@ public class WaitingState extends GameState {
         player.setExp(0);
         player.setLevel(0);
         player.teleport(getGame().getWorld().getSpawnLocation());
-        player.getEquipment().setChestplate(new ItemStack(Material.ELYTRA));
 
         ItemStack mapItem = new ItemStack(Material.FILLED_MAP);
         mapItem.editMeta(MapMeta.class, mapMeta -> mapMeta.setMapView(getGame().getMapView()));
