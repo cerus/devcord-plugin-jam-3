@@ -4,26 +4,20 @@ package me.celus.pluginjam;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
-import me.celus.pluginjam.listener.ElytraListener;
+import me.celus.pluginjam.game.Game;
+import me.celus.pluginjam.game.state.WaitingState;
 import me.celus.pluginjam.listener.PlayerJoinListener;
 import me.celus.pluginjam.util.PacketInjector;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Chunk;
-import org.bukkit.GameRule;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.WorldBorder;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class JamPlugin extends JavaPlugin {
 
-    public static final int GAME_WIDTH = 21;
-    private static final int SPAWN_X = 8;
-    private static final int SPAWN_Z = 8;
-
-    private World gameWorld;
+    private Game game;
 
     @Override
     public void onLoad() {
@@ -44,45 +38,35 @@ public class JamPlugin extends JavaPlugin {
         //ServerApi api = getPlugin(PluginJam.class).api();
         // api.requestRestart();
 
-        PacketInjector.registerOutboundHandler(ClientboundLevelChunkWithLightPacket.class, (player, packet) -> {
-            int adjustedWidth = (GAME_WIDTH / 2) + 1;
-            return Math.abs(packet.getX()) <= adjustedWidth && Math.abs(packet.getZ()) <= adjustedWidth;
-        });
+        World world = getServer().getWorld("world");
+        world.setSpawnLocation(8, 0, 8);
+
+        newGame();
 
         PluginManager pluginManager = getServer().getPluginManager();
-        pluginManager.registerEvents(new PlayerJoinListener(this), this);
-        pluginManager.registerEvents(new ElytraListener(), this);
+        pluginManager.registerEvents(new PlayerJoinListener(), this);
 
-        gameWorld = getServer().getWorld("world");
-        gameWorld.setGameRule(GameRule.SPAWN_RADIUS, 0);
-        WorldBorder worldBorder = gameWorld.getWorldBorder();
-        worldBorder.setCenter(SPAWN_X, SPAWN_Z);
-        worldBorder.setSize(16 * GAME_WIDTH);
-
-        generateSpawnBox(Material.BEDROCK, Material.GLASS);
-
-        gameWorld.setSpawnLocation(SPAWN_X, gameWorld.getHighestBlockYAt(SPAWN_X, SPAWN_Z) + 1, SPAWN_Z);
+        PacketInjector.registerOutboundHandler(ClientboundLevelChunkWithLightPacket.class, (player, packet) -> {
+            if (game == null || game.getWorld() == null) {
+                return true;
+            }
+            Chunk spawnChunk = game.getWorld().getSpawnLocation().getChunk();
+            int widthPos = (Game.GAME_WIDTH / 2) + 1 + spawnChunk.getX();
+            int widthNeg = spawnChunk.getX() + -((Game.GAME_WIDTH / 2) + 1);
+            int cx = packet.getX();
+            int cz = packet.getZ();
+            return cx <= widthPos && cz <= widthPos
+                   && cx >= widthNeg && cz >= widthNeg;
+        });
     }
 
-    public void generateSpawnBox(Material wallMat, Material floorMat) {
-        int spawnLayer = gameWorld.getMaxHeight() - 8;
-        Chunk chunkZero = gameWorld.getChunkAt(0, 0);
-        for (int y = spawnLayer; y < gameWorld.getMaxHeight(); y++) {
-            for (int i = 0; i < 16; i++) {
-                chunkZero.getBlock(i, y, 0).setType(wallMat);
-                chunkZero.getBlock(i, y, 15).setType(wallMat);
-                chunkZero.getBlock(0, y, i).setType(wallMat);
-                chunkZero.getBlock(15, y, i).setType(wallMat);
-            }
+    public void newGame() {
+        if (game != null) {
+            game.stop();
         }
-        for (int x = 1; x < 15; x++) {
-            for (int z = 1; z < 15; z++) {
-                chunkZero.getBlock(x, spawnLayer, z).setType(floorMat);
-            }
-        }
-    }
-
-    public World getGameWorld() {
-        return gameWorld;
+        World world = getServer().getWorld("world");
+        game = new Game(this, world);
+        game.start(new WaitingState());
+        getServer().getPluginManager().registerEvents(game, this);
     }
 }
