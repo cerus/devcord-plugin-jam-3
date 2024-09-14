@@ -1,17 +1,15 @@
 package me.celus.pluginjam.feature;
 
+import java.util.HashSet;
+import java.util.Set;
 import me.celus.pluginjam.JamPlugin;
 import me.celus.pluginjam.util.PacketTricks;
-import net.minecraft.network.protocol.game.ClientboundHurtAnimationPacket;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class SheepExplosionFeature implements Feature {
 
@@ -51,8 +49,8 @@ public class SheepExplosionFeature implements Feature {
                 }
 
                 if (ticks == nextRunningTick) {
-                    plugin.getServer().getOnlinePlayers().forEach(player -> PacketTricks.sendPacket(player, new ClientboundHurtAnimationPacket(id, 0)));
-                    nextRunningTick = ticks+delay;
+                    plugin.getServer().getOnlinePlayers().forEach(player -> PacketTricks.playHurtAnimation(player, entity));
+                    nextRunningTick = ticks + delay;
                     delay -= 5;
                 }
 
