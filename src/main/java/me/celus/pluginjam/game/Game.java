@@ -101,12 +101,12 @@ public class Game implements Listener {
         if (currentState.shouldContinue()) {
             return;
         }
-        currentState.onEnd();
         setState(currentState.getNextState());
     }
 
     private void setState(GameState state) {
         if (currentState != null) {
+            currentState.onEnd();
             HandlerList.unregisterAll(currentState);
         }
         currentState = state;
@@ -124,6 +124,8 @@ public class Game implements Listener {
         plugin.getLogger().info("Disposing game");
         mapView.getRenderers().forEach(mapView::removeRenderer);
         gameTask.cancel();
+        setState(null);
+        HandlerList.unregisterAll(this);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
