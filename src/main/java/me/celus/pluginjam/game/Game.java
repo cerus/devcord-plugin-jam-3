@@ -32,9 +32,10 @@ import org.bukkit.scheduler.BukkitTask;
 public class Game implements Listener {
 
     public static final int GAME_WIDTH = 21;
-    public static final double WATER_BIOME_THRESHOLD = 0.25;
-    private static final EnumSet<Biome> WATER_BIOMES = EnumSet.of(Biome.OCEAN, Biome.COLD_OCEAN, Biome.DEEP_OCEAN, Biome.DEEP_COLD_OCEAN,
-            Biome.WARM_OCEAN, Biome.LUKEWARM_OCEAN, Biome.FROZEN_OCEAN, Biome.DEEP_LUKEWARM_OCEAN, Biome.RIVER, Biome.FROZEN_RIVER, Biome.DEEP_FROZEN_OCEAN);
+    public static final double UNDESIRED_BIOME_THRESHOLD = 0.25;
+    private static final EnumSet<Biome> UNDESIRED_BIOMES = EnumSet.of(Biome.OCEAN, Biome.COLD_OCEAN, Biome.DEEP_OCEAN, Biome.DEEP_COLD_OCEAN,
+            Biome.WARM_OCEAN, Biome.LUKEWARM_OCEAN, Biome.FROZEN_OCEAN, Biome.DEEP_LUKEWARM_OCEAN, Biome.RIVER, Biome.FROZEN_RIVER,
+            Biome.DEEP_FROZEN_OCEAN, Biome.BADLANDS, Biome.ERODED_BADLANDS, Biome.SNOWY_PLAINS);
 
     private final List<Participant> participants = new ArrayList<>();
     private final JamPlugin plugin;
@@ -54,6 +55,9 @@ public class Game implements Listener {
         world.setGameRule(GameRule.SPAWN_RADIUS, 0);
         world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        world.setTime(6000);
 
         Location spawnLoc = findSuitableSpawn(world);
         WorldBorder worldBorder = world.getWorldBorder();
@@ -78,7 +82,7 @@ public class Game implements Listener {
             plugin.getLogger().info("Finished generating game map.");
         });
 
-        generateSpawnBox(Material.BARRIER, Material.GLASS);
+        generateSpawnBox(Material.BARRIER, Material.BARRIER);
     }
 
     public void start(GameState firstState) {
@@ -140,7 +144,7 @@ public class Game implements Listener {
         participants.add(new Participant(player));
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getPlayer();
         participants.stream()
@@ -149,6 +153,11 @@ public class Game implements Listener {
                 .ifPresent(participant -> {
                     participant.setDeathLocation(player.getLocation());
                     player.getWorld().strikeLightningEffect(player.getLocation());
+
+                    int placement = (int) getParticipants().stream()
+                            .filter(Participant::isAlive)
+                            .count();
+                    participant.setPlacement(placement);
                 });
     }
 
@@ -161,7 +170,7 @@ public class Game implements Listener {
         }, 3);
 
         Location spawnLoc = player.getWorld().getSpawnLocation().clone();
-        spawnLoc.setY(spawnLoc.getWorld().getMaxHeight() - 8);
+        spawnLoc.setY(spawnLoc.getWorld().getHighestBlockYAt(spawnLoc.getBlockX(), spawnLoc.getBlockZ()) + 32);
         spawnLoc.setPitch(90);
         event.setRespawnLocation(spawnLoc);
     }
@@ -171,14 +180,14 @@ public class Game implements Listener {
         int checks = 1;
         do {
             // I am aware that this message will always get printed at least once no matter how safe the spawn is. However, I do not care.
-            plugin.getLogger().info("Found more than %s%% water biomes at spawn. Generating new spawn...".formatted((int) (WATER_BIOME_THRESHOLD * 100)));
+            plugin.getLogger().info("Found more than %s%% undesired biomes at spawn. Generating new spawn...".formatted((int) (UNDESIRED_BIOME_THRESHOLD * 100)));
             int extra = checks * GAME_WIDTH * 16 * 4;
             loc.add(extra, 0, extra);
-        } while (getWaterBiomePercentage(loc) > WATER_BIOME_THRESHOLD);
+        } while (getUndesiredBiomePercentage(loc) > UNDESIRED_BIOME_THRESHOLD);
         return loc;
     }
 
-    private double getWaterBiomePercentage(Location center) {
+    private double getUndesiredBiomePercentage(Location center) {
         World world = center.getWorld();
         int oceans = 0;
         int fromX = center.getChunk().getX() - ((GAME_WIDTH / 2) + 1);
@@ -188,12 +197,11 @@ public class Game implements Listener {
             for (int z = 0; z < GAME_WIDTH; z++) {
                 int cz = fromZ + z;
                 Biome biome = world.getBiome(cx * 16 + 8, world.getSeaLevel() - 1, cz * 16 + 8);
-                if (WATER_BIOMES.contains(biome)) {
+                if (UNDESIRED_BIOMES.contains(biome)) {
                     oceans++;
                 }
             }
         }
-        Bukkit.getLogger().info("DEBUG: oceans=" + oceans + " (" + ((double) oceans / (GAME_WIDTH * GAME_WIDTH)) + ")");
         return (double) oceans / (GAME_WIDTH * GAME_WIDTH);
     }
 
@@ -215,6 +223,12 @@ public class Game implements Listener {
         }
     }
 
+    public Participant getParticipant(Player player) {
+        return participants.stream()
+                .filter(participant -> participant.getPlayer() == player)
+                .findAny().orElse(null);
+    }
+
     public World getWorld() {
         return world;
     }
@@ -227,10 +241,15 @@ public class Game implements Listener {
         return participants;
     }
 
-    public class Participant {
+    public GameState getCurrentState() {
+        return currentState;
+    }
+
+    public static class Participant {
 
         private final Player player;
         private Location deathLocation;
+        private int placement;
 
         public Participant(Player player) {
             this.player = player;
@@ -246,6 +265,14 @@ public class Game implements Listener {
 
         public void setDeathLocation(Location deathLocation) {
             this.deathLocation = deathLocation;
+        }
+
+        public int getPlacement() {
+            return placement;
+        }
+
+        public void setPlacement(int placement) {
+            this.placement = placement;
         }
 
         public boolean isAlive() {

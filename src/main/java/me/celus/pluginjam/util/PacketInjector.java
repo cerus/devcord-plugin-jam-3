@@ -23,8 +23,13 @@ public final class PacketInjector {
         throw new UnsupportedOperationException();
     }
 
-    public static <T extends Packet<?>> void registerOutboundHandler(Class<T> packetClass, PacketHandler<T> handler) {
+    public static <T extends Packet<?>> PacketHandler<T> registerOutboundHandler(Class<T> packetClass, PacketHandler<T> handler) {
         typedOutboundHandlers.computeIfAbsent(packetClass, $ -> new ArrayList<>()).add(handler);
+        return handler;
+    }
+
+    public static <T extends Packet<?>> void deregisterOutboundHandler(Class<T> packetClass, PacketHandler<T> handler) {
+        typedOutboundHandlers.computeIfAbsent(packetClass, $ -> new ArrayList<>()).remove(handler);
     }
 
     public static <T extends Packet<?>> void registerInboundHandler(Class<T> packetClass, PacketHandler<T> handler) {

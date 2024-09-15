@@ -23,14 +23,15 @@ public class FluidSwitchFeature implements Feature {
     private final Predicate<BlockData> waterPredicate = blockState -> blockState.getMaterial() == Material.WATER
                                                                       || (blockState instanceof Waterlogged wl) && wl.isWaterlogged()
                                                                       || blockState.getMaterial() == Material.SEAGRASS
-                                                                      || blockState.getMaterial() == Material.TALL_SEAGRASS;
+                                                                      || blockState.getMaterial() == Material.TALL_SEAGRASS
+                                                                      || blockState.getMaterial() == Material.ICE;
     private final Predicate<BlockData> lavaPredicate = blockState -> blockState.getMaterial() == Material.LAVA;
     private final Map<Long, Set<BlockState>> chunkLavaStates = new HashMap<>();
     private boolean fluidToggle;
 
     @Override
     public void onRegister(JamPlugin plugin) {
-        int delayBetweenChanges = ThreadLocalRandom.current().nextInt(60, 60 * 5) * 20;
+        int delayBetweenChanges = ThreadLocalRandom.current().nextInt(60, 60 * 3) * 20;
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
             updateWorld(plugin);
         }, delayBetweenChanges, delayBetweenChanges);
