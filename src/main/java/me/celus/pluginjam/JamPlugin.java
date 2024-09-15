@@ -11,15 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import me.celus.pluginjam.command.SetDelayCommand;
 import me.celus.pluginjam.command.StartGameCommand;
-import me.celus.pluginjam.feature.ArrowHitShowsCreditsFeature;
-import me.celus.pluginjam.feature.EntityScalingFeature;
-import me.celus.pluginjam.feature.Feature;
-import me.celus.pluginjam.feature.FluidSwitchFeature;
-import me.celus.pluginjam.feature.ItemFloatFeature;
-import me.celus.pluginjam.feature.PortalFeature;
-import me.celus.pluginjam.feature.SheepExplosionFeature;
-import me.celus.pluginjam.feature.SunGravityFeature;
-import me.celus.pluginjam.feature.TooManyArrowsFeature;
+import me.celus.pluginjam.feature.*;
 import me.celus.pluginjam.game.Game;
 import me.celus.pluginjam.game.state.WaitingState;
 import me.celus.pluginjam.listener.PlayerJoinListener;
@@ -92,6 +84,7 @@ public class JamPlugin extends JavaPlugin {
         registerFeature(new PortalFeature());
         registerFeature(new ItemFloatFeature());
         registerFeature(new TooManyArrowsFeature());
+        registerFeature(new EndermanStealsItemFeature());
 
         getCommand("startgame").setExecutor(new StartGameCommand(this));
         getCommand("setdelay").setExecutor(new SetDelayCommand(this));

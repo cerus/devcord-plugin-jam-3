@@ -98,7 +98,8 @@ public class WaitingState extends GameState {
                 Schafe scheren
                 Schwimmen gehen
                 Portale verwenden
-                Pfeil und Bogen verwenden</#cfaa76>
+                Pfeil und Bogen verwenden
+                Enderman sauer machen</#cfaa76>
                 """);
         explanation(1, 0.5, 7, d -> {
             d.text(getPlugin().getDeveloperMax());

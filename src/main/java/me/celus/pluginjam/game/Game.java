@@ -129,6 +129,9 @@ public class Game implements Listener {
         mapView.getRenderers().forEach(mapView::removeRenderer);
         gameTask.cancel();
         HandlerList.unregisterAll(this);
+        if (currentState != null) {
+            HandlerList.unregisterAll(currentState);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
