@@ -82,4 +82,8 @@ bukkit {
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
     main = "me.celus.pluginjam.JamPlugin"
     apiVersion = "1.21"
+    commands {
+        register("startgame")
+        register("setdelay")
+    }
 }

@@ -22,7 +22,7 @@ public class PaintedWorldRenderer extends MapRenderer {
     @Override
     @SuppressWarnings("deprecation")
     public void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull Player player) {
-        if (paintedWorld[0] == 0 || paintedWorld[paintedWorld.length - 1] == 0) {
+        if (true && (paintedWorld[0] == 0 || paintedWorld[paintedWorld.length - 1] == 0)) {
             if (delay-- > 0) {
                 return;
             }
