@@ -13,6 +13,7 @@ import me.celus.pluginjam.command.SetDelayCommand;
 import me.celus.pluginjam.command.StartGameCommand;
 import me.celus.pluginjam.feature.*;
 import me.celus.pluginjam.game.Game;
+import me.celus.pluginjam.game.GameState;
 import me.celus.pluginjam.game.state.WaitingState;
 import me.celus.pluginjam.listener.PlayerJoinListener;
 import me.celus.pluginjam.util.PacketInjector;
@@ -46,11 +47,13 @@ public class JamPlugin extends JavaPlugin {
 
         File dpDir = new File(worldDir, "datapacks/celus");
         File lootTableDir = new File(dpDir, "data/minecraft/loot_table/chests");
+        File villageLootTableDir = new File(lootTableDir, "village");
         lootTableDir.mkdirs();
 
         save("pack.mcmeta", dpDir);
         save("buried_treasure.json", lootTableDir);
         save("jungle_temple_dispenser.json", lootTableDir);
+        save("village_temple.json", villageLootTableDir);
     }
 
     private void save(String path, File dir) {
@@ -74,7 +77,7 @@ public class JamPlugin extends JavaPlugin {
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new PlayerJoinListener(), this);
 
-        newGame();
+        newGame(null);
 
         registerFeature(new SheepExplosionFeature());
         registerFeature(new ArrowHitShowsCreditsFeature());
@@ -109,14 +112,21 @@ public class JamPlugin extends JavaPlugin {
     }
 
     public void newGame() {
-        getLogger().info("Starting new game");
+        newGame(new WaitingState());
+    }
+
+    public void newGame(GameState initialState) {
         if (game != null) {
             game.stop();
             features.forEach(f -> f.onGameDestroyed(game));
         }
+        getLogger().info("Starting new game");
         World world = getServer().getWorld("world");
         game = new Game(this, world);
-        game.start(new WaitingState());
+        if (initialState != null) {
+            game.init();
+            game.start(initialState);
+        }
         getServer().getPluginManager().registerEvents(game, this);
         features.forEach(f -> f.onGameSpawned(game));
     }

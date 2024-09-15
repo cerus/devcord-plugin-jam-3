@@ -65,11 +65,11 @@ import org.bukkit.potion.PotionEffectType;
 
 public class PlayState extends GameState {
 
-    private static final boolean DEBUG_NO_FINISH = false;
+    private static final boolean DEBUG_NO_FINISH = true;
 
     private static final List<LootTables> POSSIBLE_LOOT_TABLES = List.of(LootTables.SPAWN_BONUS_CHEST, LootTables.VILLAGE_PLAINS_HOUSE,
             LootTables.SHIPWRECK_SUPPLY, LootTables.SHIPWRECK_TREASURE, LootTables.JUNGLE_TEMPLE_DISPENSER, LootTables.VILLAGE_TEMPLE);
-    private static final List<LootTables> TREASURE_LOOT_TABLES = List.of(LootTables.BURIED_TREASURE, LootTables.END_CITY_TREASURE);
+    private static final List<LootTables> TREASURE_LOOT_TABLES = List.of(LootTables.BURIED_TREASURE, LootTables.END_CITY_TREASURE, LootTables.BASTION_TREASURE);
     private static final int GAME_LENGTH = 20 * 60 * 10;
     private static final int ZONE_SHRINK_AMOUNT = 4;
     private static final int ZONE_SHRINK_TICKS = GAME_LENGTH / ZONE_SHRINK_AMOUNT;
@@ -231,7 +231,7 @@ public class PlayState extends GameState {
     private void spawnChest(Chunk chunk) {
         ThreadLocalRandom rand = ThreadLocalRandom.current();
         if (chunk == chunk.getWorld().getSpawnLocation().getChunk()
-            || rand.nextInt(32) == 0) {
+            || rand.nextInt(24) == 0) {
             spawnHighValueChest(chunk);
             return;
         }
