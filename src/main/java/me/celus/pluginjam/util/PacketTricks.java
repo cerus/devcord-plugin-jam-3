@@ -3,6 +3,7 @@ package me.celus.pluginjam.util;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
 import net.minecraft.network.protocol.game.ClientboundHurtAnimationPacket;
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -28,6 +29,11 @@ public final class PacketTricks {
     }
 
     public static void sendPacket(Player player, Packet<?> packet) {
-        ((CraftPlayer) player).getHandle().connection.sendPacket(packet);
+        sendPacket(((CraftPlayer) player).getHandle(), packet);
     }
+
+    public static void sendPacket(ServerPlayer player, Packet<?> packet) {
+        player.connection.sendPacket(packet);
+    }
+
 }

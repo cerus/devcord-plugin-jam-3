@@ -4,9 +4,8 @@ package me.celus.pluginjam;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
-import me.celus.pluginjam.feature.ArrowHitShowsCreditsFeature;
-import me.celus.pluginjam.feature.Feature;
-import me.celus.pluginjam.feature.SheepExplosionFeature;
+
+import me.celus.pluginjam.feature.*;
 import me.celus.pluginjam.game.Game;
 import me.celus.pluginjam.game.state.WaitingState;
 import me.celus.pluginjam.listener.PlayerJoinListener;
@@ -51,6 +50,8 @@ public class JamPlugin extends JavaPlugin {
 
         registerFeature(new SheepExplosionFeature());
         registerFeature(new ArrowHitShowsCreditsFeature());
+        registerFeature(new EntityScalingFeature());
+        registerFeature(new SunGravityFeature());
 
         PacketInjector.registerOutboundHandler(ClientboundLevelChunkWithLightPacket.class, (player, packet) -> {
             if (game == null || game.getWorld() == null) {
@@ -74,6 +75,10 @@ public class JamPlugin extends JavaPlugin {
         game = new Game(this, world);
         game.start(new WaitingState());
         getServer().getPluginManager().registerEvents(game, this);
+    }
+
+    public Game getGame() {
+        return game;
     }
 
     private void registerFeature(Feature feature) {

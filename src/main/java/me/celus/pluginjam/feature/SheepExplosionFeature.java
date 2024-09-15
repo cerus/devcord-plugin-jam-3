@@ -56,7 +56,7 @@ public class SheepExplosionFeature implements Feature {
 
                 ticks++;
                 if (ticks == durationTicks) {
-                    plugin.getServer().getScheduler().callSyncMethod(plugin, () -> entity.getWorld().createExplosion(entity.getLocation(), 1));
+                    plugin.getServer().getScheduler().callSyncMethod(plugin, () -> entity.getWorld().createExplosion(entity.getLocation(), 5));
                     this.cancel();
                 }
             }
