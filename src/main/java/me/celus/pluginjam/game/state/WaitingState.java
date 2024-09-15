@@ -27,7 +27,7 @@ import org.bukkit.inventory.meta.MapMeta;
 public class WaitingState extends GameState {
 
     private static final int MIN_PLAYERS = 4;
-    private static final int START_DELAY = 20 * 20 + 1;
+    private static final int START_DELAY = 20 * 60 + 1;
     private static final int DISPLAY_REMOVE_DELAY = 40;
     private final Set<TextDisplay> explanationDisplays = new HashSet<>();
     private TextDisplay display;

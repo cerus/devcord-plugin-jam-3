@@ -11,7 +11,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import me.celus.pluginjam.command.SetDelayCommand;
 import me.celus.pluginjam.command.StartGameCommand;
-import me.celus.pluginjam.feature.*;
+import me.celus.pluginjam.feature.ArrowHitShowsCreditsFeature;
+import me.celus.pluginjam.feature.EndermanStealsItemFeature;
+import me.celus.pluginjam.feature.EntityScalingFeature;
+import me.celus.pluginjam.feature.Feature;
+import me.celus.pluginjam.feature.FluidSwitchFeature;
+import me.celus.pluginjam.feature.ItemFloatFeature;
+import me.celus.pluginjam.feature.PortalFeature;
+import me.celus.pluginjam.feature.SheepExplosionFeature;
+import me.celus.pluginjam.feature.SunGravityFeature;
+import me.celus.pluginjam.feature.TooManyArrowsFeature;
 import me.celus.pluginjam.game.Game;
 import me.celus.pluginjam.game.GameState;
 import me.celus.pluginjam.game.state.WaitingState;
@@ -21,6 +30,7 @@ import me.celus.pluginjam.util.TextureUtil;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import org.apache.commons.io.FileUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.plugin.PluginManager;
@@ -91,6 +101,8 @@ public class JamPlugin extends JavaPlugin {
 
         getCommand("startgame").setExecutor(new StartGameCommand(this));
         getCommand("setdelay").setExecutor(new SetDelayCommand(this));
+
+        Bukkit.getServer().getAllowNether();
 
         PacketInjector.registerOutboundHandler(ClientboundLevelChunkWithLightPacket.class, (player, packet) -> {
             if (game == null || game.getWorld() == null) {

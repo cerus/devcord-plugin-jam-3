@@ -52,6 +52,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.InventoryHolder;
@@ -304,6 +305,13 @@ public class PlayState extends GameState {
         int mins = (remainingTicks / 20) / 60;
         int secs = (remainingTicks / 20) % 60;
         return "Zone: " + mins + "m " + secs + "s";
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        gameEndBar.addPlayer(player);
+        zoneChangeBar.addPlayer(player);
     }
 
     @EventHandler

@@ -9,6 +9,7 @@ import me.celus.pluginjam.map.PaintedWorldRenderer;
 import me.celus.pluginjam.util.MapUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -56,6 +57,7 @@ public class Game implements Listener {
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        world.setDifficulty(Difficulty.NORMAL);
         world.setTime(0);
 
         Location spawnLoc = findSuitableSpawn(world);
