@@ -65,7 +65,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class PlayState extends GameState {
 
-    private static final boolean DEBUG_NO_FINISH = false;
+    private static final boolean DEBUG_NO_FINISH = true;
 
     private static final List<LootTables> POSSIBLE_LOOT_TABLES = List.of(LootTables.SPAWN_BONUS_CHEST, LootTables.VILLAGE_PLAINS_HOUSE,
             LootTables.SHIPWRECK_SUPPLY, LootTables.SHIPWRECK_TREASURE, LootTables.JUNGLE_TEMPLE_DISPENSER, LootTables.VILLAGE_TEMPLE);

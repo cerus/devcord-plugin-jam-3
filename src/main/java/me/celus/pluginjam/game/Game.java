@@ -48,10 +48,9 @@ public class Game implements Listener {
     public Game(JamPlugin plugin, World world) {
         this.plugin = plugin;
         this.world = world;
-        init();
     }
 
-    private void init() {
+    public void init() {
         world.setGameRule(GameRule.SPAWN_RADIUS, 0);
         world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
@@ -126,8 +125,12 @@ public class Game implements Listener {
 
     public void stop() {
         plugin.getLogger().info("Disposing game");
-        mapView.getRenderers().forEach(mapView::removeRenderer);
-        gameTask.cancel();
+        if (mapView != null) {
+            mapView.getRenderers().forEach(mapView::removeRenderer);
+        }
+        if (gameTask != null) {
+            gameTask.cancel();
+        }
         HandlerList.unregisterAll(this);
     }
 
