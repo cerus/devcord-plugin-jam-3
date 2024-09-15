@@ -57,7 +57,7 @@ public class Game implements Listener {
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
-        world.setTime(6000);
+        world.setTime(0);
 
         Location spawnLoc = findSuitableSpawn(world);
         WorldBorder worldBorder = world.getWorldBorder();

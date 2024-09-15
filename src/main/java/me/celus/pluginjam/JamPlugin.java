@@ -82,6 +82,8 @@ public class JamPlugin extends JavaPlugin {
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new PlayerJoinListener(), this);
 
+        newGame();
+
         registerFeature(new SheepExplosionFeature());
         registerFeature(new ArrowHitShowsCreditsFeature());
         registerFeature(new EntityScalingFeature());
